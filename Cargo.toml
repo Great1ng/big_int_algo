@@ -1,0 +1,18 @@
+[package]
+name = "big_int_algo"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+smallvec = "1.10.0"
+
+[dev-dependencies]
+criterion = "0.4"
+
+[[bench]]
+name = "multiplication_benchmark"
+harness = false
+
+[[bench]]
+name = "addition_benchmark"
+harness = false
