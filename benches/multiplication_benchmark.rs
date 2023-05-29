@@ -1,14 +1,21 @@
 use big_int_algo::uint::Uint;
 use criterion::{criterion_group, Criterion, criterion_main};
 
+fn factorial(n: u64) -> Uint {
+    let mut factorial = Uint::from([1]);
+    for i in 2..=n {
+        factorial *= i;
+    }
+    factorial
+}
+
 fn factorial_benchmark(c: &mut Criterion) {
-    const COUNT: u64 = 30;
+    let f = factorial(50);
+    let s = factorial(60);
 
     c.bench_function("factorial", |b| b.iter(|| {
-        let mut factorial = Uint::from([1]);
-        for i in 1..COUNT+1 {
-            factorial *= i;
-        }
+        let _ = &f * &s;
+        let _ = &s * &f;
     }));
 }
 

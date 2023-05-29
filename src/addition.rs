@@ -54,6 +54,43 @@ fn add2(a: &mut Uint, b: &Uint) {
     unsafe { add2_unchecked(a, b) };
 }
 
+/// (a) must have more or equal amount of digits than (b)
+#[inline(always)]
+unsafe fn shift_add2_unchecked(a: &mut Uint, b: &Uint, shift: usize) {
+    let mut carry = false;
+    let a_len = a.digits.len();
+    let b_len = b.digits.len();
+    let mut a_ptr = a.digits.as_mut_ptr().add(shift);
+    let mut b_ptr = b.digits.as_ptr();
+    let a_end = a_ptr.add(a_len);
+    let b_end = b_ptr.add(b_len);
+
+    while b_ptr != b_end {
+        carry = adc(carry, *a_ptr, *b_ptr, a_ptr.as_mut().unwrap_unchecked());
+        a_ptr = a_ptr.add(1);
+        b_ptr = b_ptr.add(1);
+    }
+
+    while a_ptr != a_end {
+        if !carry { break; }
+        (*a_ptr, carry) = (*a_ptr).overflowing_add(carry as Digit);
+        a_ptr = a_ptr.add(1);
+    }
+
+    if carry {
+        a.digits.push(carry as Digit);
+    }
+}
+
+/// safe version of shift_add2_unchecked
+#[inline(always)]
+pub(crate) fn shift_add2(a: &mut Uint, b: &Uint, shift: usize) {
+    if a.digits.len() < b.digits.len() + shift {
+        a.digits.resize(b.digits.len() + shift, 0);
+    }
+    unsafe { shift_add2_unchecked(a, b, shift) };
+}
+
 /// Calculates sum of (a) and (b) then store the result in (c)
 fn add3(c: &mut Uint, a: &Uint, b: &Uint) {
     let a_len = a.digits.len();

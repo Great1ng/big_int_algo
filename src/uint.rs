@@ -14,6 +14,10 @@ impl Uint {
         normalize(&mut self.digits);
     }
 
+    pub fn bits(&self) -> u128 {
+        self.digits.len() as u128 * Digit::BITS as u128
+    }
+
     pub fn div_rem(&self, other: Digit) -> (Self, Digit) {
         let mut result_digits = Digits::new();
         let mut rem: DoubleDigit = 0;
